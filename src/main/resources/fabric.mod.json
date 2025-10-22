@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "f10tracker",
+	"version": "${version}",
+	"name": "f10tracker",
+	"description": "This is an example description! Tell everyone what your mod is about!",
+	"authors": [
+		"Me!"
+	],
+	"contact": {
+		"homepage": "https://fabricmc.net/",
+		"sources": "https://github.com/FabricMC/fabric-example-mod"
+	},
+	"license": "CC0-1.0",
+	"icon": "assets/f10tracker/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"krypton1101.f10tracker.F10tracker"
+		],
+		"client": [
+			"krypton1101.f10tracker.F10trackerClient"
+		]
+	},
+	"mixins": [
+		"f10tracker.mixins.json",
+		{
+			"config": "f10tracker.client.mixins.json",
+			"environment": "client"
+		}
+	],
+	"depends": {
+		"fabricloader": ">=0.17.3",
+		"minecraft": "~1.21.8",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"another-mod": "*"
+	}
+}

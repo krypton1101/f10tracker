@@ -1,0 +1,11 @@
+{
+	"required": true,
+	"package": "krypton1101.f10tracker.mixin.client",
+	"compatibilityLevel": "JAVA_21",
+	"client": [
+		"ExampleClientMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
