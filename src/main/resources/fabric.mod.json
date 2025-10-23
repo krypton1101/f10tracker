@@ -23,11 +23,7 @@
 		]
 	},
 	"mixins": [
-		"f10tracker.mixins.json",
-		{
-			"config": "f10tracker.client.mixins.json",
-			"environment": "client"
-		}
+		
 	],
 	"depends": {
 		"fabricloader": ">=0.17.3",

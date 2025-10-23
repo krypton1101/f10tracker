@@ -1,0 +1,10 @@
+{
+  "key.f10tracker.start_logging": "Start Position Logging",
+  "key.f10tracker.stop_logging": "Stop Position Logging", 
+  "key.f10tracker.toggle_logging": "Toggle Position Logging",
+  "key.f10tracker.connect_websocket": "Connect WebSocket",
+  "key.f10tracker.disconnect_websocket": "Disconnect WebSocket",
+  "key.f10tracker.toggle_websocket": "Toggle WebSocket",
+  "category.f10tracker.general": "F10 Tracker",
+  "category.f10tracker.websocket": "F10 Tracker WebSocket"
+}

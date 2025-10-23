@@ -3,7 +3,6 @@
 	"package": "krypton1101.f10tracker.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"ExampleMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
