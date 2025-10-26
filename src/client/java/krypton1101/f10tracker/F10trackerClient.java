@@ -84,8 +84,9 @@ public class F10trackerClient implements ClientModInitializer {
 		
 		// Handle key presses
 		if (startLoggingKey.wasPressed()) {
+			long intervalMs = positionLogger.getConfig().getLogInterval();
 			if (!positionLogger.isLogging()) {
-				positionLogger.startLogging(1000); // 1 second interval
+				positionLogger.startLogging(intervalMs); // 1 second interval
 				client.player.sendMessage(net.minecraft.text.Text.literal("Started position logging"), false);
 			} else {
 				client.player.sendMessage(net.minecraft.text.Text.literal("Position logging is already active"), false);
@@ -106,7 +107,8 @@ public class F10trackerClient implements ClientModInitializer {
 				positionLogger.stopLogging();
 				client.player.sendMessage(net.minecraft.text.Text.literal("Stopped position logging"), false);
 			} else {
-				positionLogger.startLogging(1000); // 1 second interval
+				long intervalMs = positionLogger.getConfig().getLogInterval();
+				positionLogger.startLogging(intervalMs); // 1 second interval
 				client.player.sendMessage(net.minecraft.text.Text.literal("Started position logging"), false);
 			}
 		}

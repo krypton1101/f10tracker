@@ -30,7 +30,7 @@ public class PositionLogger {
     private static final String LOG_FILE_EXTENSION = ".csv";
     
     private final MinecraftClient client;
-    private final ScheduledExecutorService scheduler;
+    private ScheduledExecutorService scheduler;
     private final List<PlayerData> dataBuffer;
     private final Object bufferLock = new Object();
     private final WebSocketManager webSocketManager;
@@ -66,6 +66,13 @@ public class PositionLogger {
         this.logIntervalMs = intervalMs;
         this.isLogging = true;
         this.currentLogFile = generateLogFileName();
+        
+        // Create a new scheduler if the current one has been shut down
+        if (scheduler.isShutdown()) {
+            LOGGER.info("Creating new scheduler as previous one was shut down");
+            // Create a new scheduler
+            scheduler = Executors.newScheduledThreadPool(1);
+        }
         
         // Create log directory if it doesn't exist
         createLogDirectory();
