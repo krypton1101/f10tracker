@@ -39,42 +39,42 @@ public class F10trackerClient implements ClientModInitializer {
 		startLoggingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.f10tracker.start_logging",
 				InputUtil.Type.KEYSYM,
-				GLFW.GLFW_KEY_F9,
+				GLFW.GLFW_KEY_UNKNOWN,
 				"category.f10tracker.general"
 		));
 		
 		stopLoggingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.f10tracker.stop_logging",
 				InputUtil.Type.KEYSYM,
-				GLFW.GLFW_KEY_F10,
+				GLFW.GLFW_KEY_UNKNOWN,
 				"category.f10tracker.general"
 		));
 		
 		toggleLoggingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.f10tracker.toggle_logging",
 				InputUtil.Type.KEYSYM,
-				GLFW.GLFW_KEY_F11,
+				GLFW.GLFW_KEY_F10,
 				"category.f10tracker.general"
 		));
 		
 		connectWebSocketKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.f10tracker.connect_websocket",
 				InputUtil.Type.KEYSYM,
-				GLFW.GLFW_KEY_F12,
+				GLFW.GLFW_KEY_UNKNOWN,
 				"category.f10tracker.websocket"
 		));
 		
 		disconnectWebSocketKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.f10tracker.disconnect_websocket",
 				InputUtil.Type.KEYSYM,
-				GLFW.GLFW_KEY_F1,
+				GLFW.GLFW_KEY_UNKNOWN,
 				"category.f10tracker.websocket"
 		));
 		
 		toggleWebSocketKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.f10tracker.toggle_websocket",
 				InputUtil.Type.KEYSYM,
-				GLFW.GLFW_KEY_F2,
+				GLFW.GLFW_KEY_F9,
 				"category.f10tracker.websocket"
 		));
 	}

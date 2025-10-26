@@ -5,8 +5,6 @@ import net.fabricmc.api.ModInitializer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.neovisionaries.ws.client.WebSocket;
-
 public class F10tracker implements ModInitializer {
 	public static final String MOD_ID = "f10tracker";
 
@@ -22,6 +20,5 @@ public class F10tracker implements ModInitializer {
 		// Proceed with mild caution.
 
 		LOGGER.info("F10Tracker mod initialized - Position and velocity logging ready!");
-		LOGGER.info("Use F9 to start logging, F10 to stop logging, F11 to toggle logging");
 	}
 }
