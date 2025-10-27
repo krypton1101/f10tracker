@@ -76,6 +76,19 @@ public class WebSocketManager {
                         @Override
                         public void onTextMessage(WebSocket websocket, String text) {
                             LOGGER.debug("Received message from server: {}", text);
+                            
+                            // Check if this is checkpoint data (JSON array)
+                            if (text.trim().startsWith("[")) {
+                                // This is checkpoint data, forward to position logger
+                                if (client.world != null && client.player != null) {
+                                    // We need to access the position logger through the client
+                                    // This requires a method in F10trackerClient to get the position logger
+                                    PositionLogger logger = F10trackerClient.getPositionLogger();
+                                    if (logger != null) {
+                                        logger.updateCheckpoints(text);
+                                    }
+                                }
+                            }
                         }
                     })
                     .connect();

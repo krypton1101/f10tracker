@@ -32,6 +32,18 @@ public class F10trackerClient implements ClientModInitializer {
 		// Register tick event for handling key presses
 		ClientTickEvents.END_CLIENT_TICK.register(this::onClientTick);
 		
+		// Register tick event for continuous checkpoint checking
+		ClientTickEvents.END_CLIENT_TICK.register(client -> {
+			if (positionLogger != null && positionLogger.isLogging() && client.player != null && client.world != null) {
+				// Perform checkpoint checking on every tick
+				if (positionLogger.getConfig().isWebSocketEnabled() && positionLogger.getCheckpointManager().getCheckpointCount() > 0) {
+					if (positionLogger.getCheckpointManager().checkPlayerPosition(client.player.getPos())) {
+						positionLogger.logCurrentPosition();
+					}
+				}
+			}
+		});
+		
 		LOGGER.info("F10Tracker client initialized with position logging capabilities");
 	}
 	

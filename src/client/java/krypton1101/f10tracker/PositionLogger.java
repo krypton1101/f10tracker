@@ -35,6 +35,7 @@ public class PositionLogger {
     private final Object bufferLock = new Object();
     private final WebSocketManager webSocketManager;
     private final TrackerConfig config;
+    private final CheckpointManager checkpointManager;
     
     private boolean isLogging = false;
     private long logIntervalMs = 1000; // Default 1 second interval
@@ -46,6 +47,7 @@ public class PositionLogger {
         this.dataBuffer = new ArrayList<>();
         this.webSocketManager = new WebSocketManager(client);
         this.config = new TrackerConfig();
+        this.checkpointManager = new CheckpointManager();
         this.currentLogFile = generateLogFileName();
         
         // Initialize WebSocket connection if enabled
@@ -107,7 +109,7 @@ public class PositionLogger {
     /**
      * Log the current player position and velocity
      */
-    private void logCurrentPosition() {
+    public void logCurrentPosition() {
         if (!isLogging || client.player == null) {
             return;
         }
@@ -127,7 +129,7 @@ public class PositionLogger {
             dataBuffer.add(data);
         }
         
-        // Send to WebSocket if enabled and connected
+        // Check if player is in any checkpoint
         if (config.isWebSocketEnabled()) {
             webSocketManager.sendPlayerData(data);
         }
@@ -261,5 +263,26 @@ public class PositionLogger {
      */
     public TrackerConfig getConfig() {
         return config;
+    }
+    
+    /**
+     * Update checkpoint data from WebSocket
+     */
+    public void updateCheckpoints(String json) {
+        checkpointManager.updateCheckpoints(json);
+    }
+    
+    /**
+     * Get the checkpoint manager
+     */
+    public CheckpointManager getCheckpointManager() {
+        return checkpointManager;
+    }
+    
+    /**
+     * Get the WebSocket manager
+     */
+    public WebSocketManager getWebSocketManager() {
+        return webSocketManager;
     }
 }
