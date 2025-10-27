@@ -13,7 +13,7 @@ public class TrackerConfig {
     private static final String CONFIG_FILE = "f10tracker_config.properties";
     private static final String DEFAULT_SERVER = "ws://localhost:8080/ws";
     private static final boolean DEFAULT_WEBSOCKET_ENABLED = false;
-    private static final long DEFAULT_LOG_INTERVAL = 1000; // 1 second
+    private static final long DEFAULT_LOG_INTERVAL = 500; // 0.5 second
     
     private final Properties properties;
     private final File configFile;
