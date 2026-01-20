@@ -7,13 +7,12 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * Configuration management for F10Tracker
+ * Configuration management for F10Tracker - Lap Event Processing
  */
 public class TrackerConfig {
     private static final String CONFIG_FILE = "f10tracker_config.properties";
     private static final String DEFAULT_SERVER = "ws://localhost:8080/ws";
     private static final boolean DEFAULT_WEBSOCKET_ENABLED = false;
-    private static final long DEFAULT_LOG_INTERVAL = 500; // 0.5 second
     
     private final Properties properties;
     private final File configFile;
@@ -46,7 +45,6 @@ public class TrackerConfig {
     private void createDefaultConfig() {
         properties.setProperty("websocket.enabled", String.valueOf(DEFAULT_WEBSOCKET_ENABLED));
         properties.setProperty("websocket.server", DEFAULT_SERVER);
-        properties.setProperty("logging.interval", String.valueOf(DEFAULT_LOG_INTERVAL));
         saveConfig();
     }
     
@@ -88,21 +86,6 @@ public class TrackerConfig {
      */
     public void setWebSocketEnabled(boolean enabled) {
         properties.setProperty("websocket.enabled", String.valueOf(enabled));
-        saveConfig();
-    }
-    
-    /**
-     * Get logging interval in milliseconds
-     */
-    public long getLogInterval() {
-        return Long.parseLong(properties.getProperty("logging.interval", String.valueOf(DEFAULT_LOG_INTERVAL)));
-    }
-    
-    /**
-     * Set logging interval in milliseconds
-     */
-    public void setLogInterval(long interval) {
-        properties.setProperty("logging.interval", String.valueOf(interval));
         saveConfig();
     }
 }

@@ -21,7 +21,7 @@ public class WebSocketManager {
     private static final Logger LOGGER = LoggerFactory.getLogger("F10Tracker-WebSocket");
     
     private final MinecraftClient client;
-    private final BlockingQueue<PlayerData> dataQueue;
+    private final BlockingQueue<LapEvent> dataQueue;
     private final AtomicBoolean isConnected;
     private final AtomicBoolean shouldReconnect;
     
@@ -104,23 +104,23 @@ public class WebSocketManager {
     }
     
     /**
-     * Send PlayerData to the server
+     * Send LapEvent to the server
      */
-    public void sendPlayerData(PlayerData data) {
+    public void sendLapEvent(LapEvent event) {
         if (!isConnected.get() || webSocket == null || !webSocket.isOpen()) {
             // Queue data for later sending if not connected
             if (shouldReconnect.get()) {
-                dataQueue.offer(data);
+                dataQueue.offer(event);
             }
             return;
         }
         
         try {
-            String jsonData = dataToJson(data);
+            String jsonData = eventToJson(event);
             webSocket.sendText(jsonData);
-            LOGGER.debug("Sent player data to server: {}", data);
+            LOGGER.debug("Sent lap event to server: {}", event);
         } catch (Exception e) {
-            LOGGER.error("Failed to send player data: {}", e.getMessage(), e);
+            LOGGER.error("Failed to send lap event: {}", e.getMessage(), e);
             sendMessageToPlayer("Failed to send data to tracking server");
         }
     }
@@ -131,9 +131,9 @@ public class WebSocketManager {
     public void processQueuedData() {
         if (!isConnected.get()) return;
         
-        PlayerData data;
-        while ((data = dataQueue.poll()) != null) {
-            sendPlayerData(data);
+        LapEvent event;
+        while ((event = dataQueue.poll()) != null) {
+            sendLapEvent(event);
         }
     }
     
@@ -159,16 +159,14 @@ public class WebSocketManager {
     }
     
     /**
-     * Convert PlayerData to JSON format
+     * Convert LapEvent to JSON format
      */
-    private String dataToJson(PlayerData data) {
+    private String eventToJson(LapEvent event) {
         return String.format(
-            "{\"UUID\":\"%s\",\"timestamp\":%d,\"position\":{\"x\":%.6f,\"y\":%.6f,\"z\":%.6f},\"velocity\":{\"x\":%.6f,\"y\":%.6f,\"z\":%.6f},\"yaw\":%.3f,\"pitch\":%.3f}",
-            data.getPlayerUuid(),
-            data.getTimestamp(),
-            data.getPosition().x, data.getPosition().y, data.getPosition().z,
-            data.getVelocity().x, data.getVelocity().y, data.getVelocity().z,
-            data.getYaw(), data.getPitch()
+            "{\"UUID\":\"%s\",\"timestamp\":%d,\"is_start\":%b}",
+            event.getUuid(),
+            event.getTimestamp(),
+            event.isStart()
         );
     }
     

@@ -3,20 +3,21 @@ package krypton1101.f10tracker;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
+import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.util.InputUtil;
+import net.minecraft.text.Text;
 import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.UUID;
 
 public class F10trackerClient implements ClientModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger("F10Tracker-Client");
 	
 	private static PositionLogger positionLogger;
-	private static KeyBinding startLoggingKey;
-	private static KeyBinding stopLoggingKey;
-	private static KeyBinding toggleLoggingKey;
 	private static KeyBinding connectWebSocketKey;
 	private static KeyBinding disconnectWebSocketKey;
 	private static KeyBinding toggleWebSocketKey;
@@ -32,31 +33,46 @@ public class F10trackerClient implements ClientModInitializer {
 		// Register tick event for handling key presses
 		ClientTickEvents.END_CLIENT_TICK.register(this::onClientTick);
 		
-		LOGGER.info("F10Tracker client initialized with position logging capabilities");
+		// Register chat message event listener
+		ClientReceiveMessageEvents.GAME.register(this::onChatMessage);
+		
+		LOGGER.info("F10Tracker client initialized with chat message processing capabilities");
+	}
+	
+	private void onChatMessage(Text message, boolean overlay) {
+		String messageText = message.getString();
+		LOGGER.info("Received chat message: {}", messageText);
+		
+		// Process "Start!" message
+		if ("Start!".equals(messageText)) {
+			// Send start event with player's own UUID
+			if (MinecraftClient.getInstance().player != null) {
+				LapEvent startEvent = new LapEvent("0", System.currentTimeMillis(), true);
+				if (positionLogger.isWebSocketConnected()) {
+					positionLogger.getWebSocketManager().sendLapEvent(startEvent);
+				}
+			}
+			return;
+		}
+		
+		// Process "Player {UUID} finished lap." message
+		if (messageText.startsWith("Player ") && messageText.endsWith(" finished lap.")) {
+			// Extract UUID from message
+			String uuidPart = messageText.substring(7, messageText.length() - 14); // "Player ".length() = 7, " finished lap.".length() = 14
+			try {
+				// Validate UUID format
+				UUID.fromString(uuidPart);
+				LapEvent lapEvent = new LapEvent(uuidPart, System.currentTimeMillis(), false);
+				if (positionLogger.isWebSocketConnected()) {
+					positionLogger.getWebSocketManager().sendLapEvent(lapEvent);
+				}
+			} catch (IllegalArgumentException e) {
+				LOGGER.warn("Invalid UUID in chat message: {}", messageText);
+			}
+		}
 	}
 	
 	private void registerKeyBindings() {
-		startLoggingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-				"key.f10tracker.start_logging",
-				InputUtil.Type.KEYSYM,
-				GLFW.GLFW_KEY_UNKNOWN,
-				"category.f10tracker.general"
-		));
-		
-		stopLoggingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-				"key.f10tracker.stop_logging",
-				InputUtil.Type.KEYSYM,
-				GLFW.GLFW_KEY_UNKNOWN,
-				"category.f10tracker.general"
-		));
-		
-		toggleLoggingKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-				"key.f10tracker.toggle_logging",
-				InputUtil.Type.KEYSYM,
-				GLFW.GLFW_KEY_F10,
-				"category.f10tracker.general"
-		));
-		
 		connectWebSocketKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
 				"key.f10tracker.connect_websocket",
 				InputUtil.Type.KEYSYM,
@@ -81,37 +97,6 @@ public class F10trackerClient implements ClientModInitializer {
 	
 	private void onClientTick(MinecraftClient client) {
 		if (client.player == null) return;
-		
-		// Handle key presses
-		if (startLoggingKey.wasPressed()) {
-			long intervalMs = positionLogger.getConfig().getLogInterval();
-			if (!positionLogger.isLogging()) {
-				positionLogger.startLogging(intervalMs); // 1 second interval
-				client.player.sendMessage(net.minecraft.text.Text.literal("Started position logging"), false);
-			} else {
-				client.player.sendMessage(net.minecraft.text.Text.literal("Position logging is already active"), false);
-			}
-		}
-		
-		if (stopLoggingKey.wasPressed()) {
-			if (positionLogger.isLogging()) {
-				positionLogger.stopLogging();
-				client.player.sendMessage(net.minecraft.text.Text.literal("Stopped position logging"), false);
-			} else {
-				client.player.sendMessage(net.minecraft.text.Text.literal("Position logging is not active"), false);
-			}
-		}
-		
-		if (toggleLoggingKey.wasPressed()) {
-			if (positionLogger.isLogging()) {
-				positionLogger.stopLogging();
-				client.player.sendMessage(net.minecraft.text.Text.literal("Stopped position logging"), false);
-			} else {
-				long intervalMs = positionLogger.getConfig().getLogInterval();
-				positionLogger.startLogging(intervalMs); // 1 second interval
-				client.player.sendMessage(net.minecraft.text.Text.literal("Started position logging"), false);
-			}
-		}
 		
 		// WebSocket key handling
 		if (connectWebSocketKey.wasPressed()) {
