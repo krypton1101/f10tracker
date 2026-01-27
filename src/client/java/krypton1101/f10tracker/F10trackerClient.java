@@ -44,7 +44,7 @@ public class F10trackerClient implements ClientModInitializer {
 		LOGGER.info("Received chat message: {}", messageText);
 		
 		// Process "Start!" message
-		if ("Start!".equals(messageText)) {
+		if (messageText.contains("Start!")) {
 			// Send start event with player's own UUID
 			if (MinecraftClient.getInstance().player != null) {
 				LapEvent startEvent = new LapEvent("0", System.currentTimeMillis(), true);
@@ -56,9 +56,9 @@ public class F10trackerClient implements ClientModInitializer {
 		}
 		
 		// Process "Player {UUID} finished lap." message
-		if (messageText.startsWith("Player ") && messageText.endsWith(" finished lap.")) {
+		if (messageText.contains("Player ") && messageText.contains(" finished lap.")) {
 			// Extract UUID from message
-			String uuidPart = messageText.substring(7, messageText.length() - 14); // "Player ".length() = 7, " finished lap.".length() = 14
+			String uuidPart = messageText.substring(19, messageText.length() - 14); // "Player ".length() = 7, " finished lap.".length() = 14
 			try {
 				// Validate UUID format
 				UUID.fromString(uuidPart);
@@ -67,7 +67,7 @@ public class F10trackerClient implements ClientModInitializer {
 					positionLogger.getWebSocketManager().sendLapEvent(lapEvent);
 				}
 			} catch (IllegalArgumentException e) {
-				LOGGER.warn("Invalid UUID in chat message: {}", messageText);
+				LOGGER.warn("Invalid UUID: {}", uuidPart);
 			}
 		}
 	}
