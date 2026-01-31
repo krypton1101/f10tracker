@@ -12,8 +12,6 @@ import org.lwjgl.glfw.GLFW;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.UUID;
-
 public class F10trackerClient implements ClientModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger("F10Tracker-Client");
 	
@@ -45,9 +43,10 @@ public class F10trackerClient implements ClientModInitializer {
 		
 		// Process "Start!" message
 		if (messageText.contains("Start!")) {
-			// Send start event with player's own UUID
+			// Send start event with player's own nickname
 			if (MinecraftClient.getInstance().player != null) {
-				LapEvent startEvent = new LapEvent("0", System.currentTimeMillis(), true);
+				String playerName = MinecraftClient.getInstance().player.getName().getString();
+				LapEvent startEvent = new LapEvent(playerName, 0, System.currentTimeMillis(), true);
 				if (positionLogger.isWebSocketConnected()) {
 					positionLogger.getWebSocketManager().sendLapEvent(startEvent);
 				}
@@ -55,19 +54,34 @@ public class F10trackerClient implements ClientModInitializer {
 			return;
 		}
 		
-		// Process "Player {UUID} finished lap." message
-		if (messageText.contains("Player ") && messageText.contains(" finished lap.")) {
-			// Extract UUID from message
-			String uuidPart = messageText.substring(19, messageText.length() - 14); // "Player ".length() = 7, " finished lap.".length() = 14
-			try {
-				// Validate UUID format
-				UUID.fromString(uuidPart);
-				LapEvent lapEvent = new LapEvent(uuidPart, System.currentTimeMillis(), false);
+		// Process "[ГОНКИ] nickname - X круг" message
+		if (messageText.startsWith("[ГОНКИ]")) {
+			// Extract nickname and lap count from message
+			// Format: [ГОНКИ] nickname - X круг
+			int startIdx = messageText.indexOf(']') + 2; // Skip "] "
+			int endIdx = messageText.lastIndexOf(" - ");
+			
+			if (startIdx > 1 && endIdx > startIdx) {
+				String nickname = messageText.substring(startIdx, endIdx);
+				String lapPart = messageText.substring(endIdx + 3); // Skip " - "
+				int lapCount = 0;
+				
+				// Extract lap count (remove " круг" part)
+				if (lapPart.endsWith(" круг")) {
+					String lapCountStr = lapPart.substring(0, lapPart.length() - 5); // Remove " круг"
+					try {
+						lapCount = Integer.parseInt(lapCountStr);
+					} catch (NumberFormatException e) {
+						LOGGER.warn("Failed to parse lap count from message: {}", messageText);
+						return;
+					}
+				}
+				
+				// Create and send lap event
+				LapEvent lapEvent = new LapEvent(nickname, lapCount, System.currentTimeMillis(), false);
 				if (positionLogger.isWebSocketConnected()) {
 					positionLogger.getWebSocketManager().sendLapEvent(lapEvent);
 				}
-			} catch (IllegalArgumentException e) {
-				LOGGER.warn("Invalid UUID: {}", uuidPart);
 			}
 		}
 	}

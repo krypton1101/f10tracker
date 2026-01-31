@@ -162,12 +162,13 @@ public class WebSocketManager {
      * Convert LapEvent to JSON format
      */
     private String eventToJson(LapEvent event) {
-        return String.format(
-            "{\"UUID\":\"%s\",\"timestamp\":%d,\"is_start\":%b}",
-            event.getUuid(),
-            event.getTimestamp(),
-            event.isStart()
-        );
+    	return String.format(
+    		"{\"nickname\":\"%s\",\"lap_count\":%d,\"timestamp\":%d,\"is_start\":%b}",
+    		event.getNickname(),
+    		event.getLapCount(),
+    		event.getTimestamp(),
+    		event.isStart()
+    	);
     }
     
     /**
